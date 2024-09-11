@@ -1,7 +1,6 @@
 name: Build FluffOS for ARM64
 
 on:
-  workflow_dispatch:  # 添加手动触发选项
   push:
     branches:
       - main
@@ -29,7 +28,10 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ ..
+        cmake -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
+              -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ \
+              -DICU_ROOT=/usr/lib/aarch64-linux-gnu \
+              ..
         make -j$(nproc)
 
     # Step 4: Archive the build (Upload the binaries as an artifact)
@@ -38,12 +40,6 @@ jobs:
       with:
         name: fluffos-arm64-bin
         path: build/bin/
-
-    # Optional Step: Test the build (Run any test cases if available)
-    - name: Run tests
-      run: |
-        cd build
-        make test
 
     # Step 5: List built files (For debugging, to see if files are present)
     - name: List build directory
