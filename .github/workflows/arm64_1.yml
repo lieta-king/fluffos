@@ -21,7 +21,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential git cmake g++-aarch64-linux-gnu libevent-dev libicu-dev
+        sudo apt-get install -y build-essential git cmake g++-aarch64-linux-gnu libevent-dev libicu-dev pkg-config
 
     # Step 3: Configure and Build for ARM64
     - name: Build for ARM64
@@ -30,7 +30,9 @@ jobs:
         cd build
         cmake -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc \
               -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ \
-              -DICU_ROOT=/usr/lib/aarch64-linux-gnu \
+              -DPKG_CONFIG_USE_CMAKE_PREFIX_PATH=ON \
+              -DICU_INCLUDE_DIR=/usr/include/aarch64-linux-gnu \
+              -DICU_LIBRARY=/usr/lib/aarch64-linux-gnu \
               ..
         make -j$(nproc)
 
