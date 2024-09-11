@@ -1,0 +1,50 @@
+name: Build FluffOS for ARM64
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout source code
+    - name: Checkout source
+      uses: actions/checkout@v2
+
+    # Step 2: Install dependencies including ICU and other necessary libraries
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential git cmake g++-aarch64-linux-gnu libevent-dev libicu-dev
+
+    # Step 3: Configure and Build for ARM64
+    - name: Build for ARM64
+      run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ ..
+        make -j$(nproc)
+
+    # Step 4: Archive the build (Upload the binaries as an artifact)
+    - name: Archive the build
+      uses: actions/upload-artifact@v3
+      with:
+        name: fluffos-arm64-bin
+        path: build/bin/
+
+    # Optional Step: Test the build (Run any test cases if available)
+    - name: Run tests
+      run: |
+        cd build
+        make test
+
+    # Step 5: List built files (For debugging, to see if files are present)
+    - name: List build directory
+      run: |
+        ls -la build/bin/
